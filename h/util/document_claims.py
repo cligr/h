@@ -14,19 +14,6 @@ and returned.
 
 from __future__ import unicode_literals
 
-import re
-
-
-# Pattern that matches DOIs (eg. "10.1000/123456").
-#
-# See https://www.doi.org/doi_handbook/2_Numbering.html#2.2 The registrant code
-# is not specified as numeric there but is currently always a 4+ digit value.
-# See https://www.doi.org/overview/DOI_article_ELIS3.pdf.
-#
-# This also accepts DOIs represented as URLs (eg.
-# "https://doi.org/10.1000/123456").
-DOI_PATTERN = re.compile('(https?://(dx\.)?doi\.org/)?10\.[0-9]{4,}[.0-9]*/.*')
-
 
 def document_uris_from_data(document_data, claimant):
     """
@@ -275,8 +262,10 @@ def doi_uri_from_string(s):
 
     If the given string doesn't already start with "doi:" it is prepended.
 
-    If the given string, minus any `doi:` prefix does not match the syntax
-    for DOI names ("10.NNNN/.*") then `None` is returned.
+    If the given string does not contain a DOI URI then None is returned.
+    Examples of strings that do not include a DOI are:
+    '', ' ', 'doi:', 'doi: ', ' doi:', ' doi: '.
+
     """
     s = s.strip()
 
@@ -285,7 +274,7 @@ def doi_uri_from_string(s):
 
     s = s.strip()
 
-    if DOI_PATTERN.match(s) is None:
+    if not s:
         return None
 
     s = 'doi:{}'.format(s)

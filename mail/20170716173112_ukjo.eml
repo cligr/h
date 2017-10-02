@@ -1,0 +1,31 @@
+From nobody Sun Jul 16 17:31:12 2017
+Content-Type: multipart/alternative;
+ boundary="===============0615887067680636510=="
+MIME-Version: 1.0
+From: nobody
+Subject: Please activate your account
+To: personman1111@gmail.com
+
+--===============0615887067680636510==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Please=20validate=20your=20email=20and=20activate=20your=20account=20by=20v=
+isiting:
+
+=20=20http://localhost:5000/activate/1/7ab5f6a64f74
+--===============0615887067680636510==
+Content-Type: text/html; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<p>Please=20validate=20your=20email=20and=20activate=20your=20account=20by=
+=20visiting:</p>
+
+
+<p>&nbsp;&nbsp;<a=20href=3D"http://localhost:5000/activate/1/7ab5f6a64f74"=
+=20mc:disable-tracking>http://localhost:5000/activate/1/7ab5f6a64f74</a></p>
+--===============0615887067680636510==--

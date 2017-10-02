@@ -93,7 +93,7 @@ class mapping_containing(Matcher):  # noqa: N801
         return '<mapping containing {!r}>'.format(self.key)
 
 
-class redirect_302_to(Matcher):  # noqa: N801
+class redirect_302_to(Matcher):
     """Matches any HTTPFound redirect to the given URL."""
 
     def __init__(self, location):
@@ -105,7 +105,7 @@ class redirect_302_to(Matcher):  # noqa: N801
         return other.location == self.location
 
 
-class redirect_303_to(Matcher):  # noqa: N801
+class redirect_303_to(Matcher):
     """Matches any HTTPSeeOther redirect to the given URL."""
 
     def __init__(self, location):
@@ -117,7 +117,7 @@ class redirect_303_to(Matcher):  # noqa: N801
         return other.location == self.location
 
 
-class regex(Matcher):  # noqa: N801
+class regex(Matcher):
     """Matches any string matching the passed regex."""
 
     def __init__(self, patt):
@@ -130,7 +130,7 @@ class regex(Matcher):  # noqa: N801
         return '<string matching re {!r}>'.format(self.patt.pattern)
 
 
-class unordered_list(Matcher):  # noqa: N801
+class unordered_list(Matcher):
     """
     Matches a list with the same items in any order.
 

@@ -15,7 +15,7 @@ class Flag(ModelFactory):
 
     class Meta:
         model = models.Flag
-        sqlalchemy_session_persistence = 'flush'
+        force_flush = True
 
     user = factory.SubFactory(User)
     annotation = factory.SubFactory(Annotation)

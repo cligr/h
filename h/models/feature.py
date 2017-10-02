@@ -21,11 +21,12 @@ FEATURES = {
                           " annotations in sidebar?"),
     'flag_action': ("Enable user to flag inappropriate annotations in the "
                     "client?"),
+    'homepage_redirects': "Enable homepage redirects (for WordPress migration)?",
     'orphans_tab': "Show the orphans tab to separate anchored and unanchored annotations?",
     'overlay_highlighter': "Use the new overlay highlighter?",
     'search_for_doi': "Use DOI metadata when searching for annotations on the current page?",
     'total_shared_annotations': "Show the total number of shared annotations for users and groups?",
-    'api_render_user_info': "Return users' extended info in API responses?",
+    'view-switcher': 'Use the new-style [Annotations|Page Notes|Orphans] view switcher control at the top of the sidebar',
 }
 
 # Once a feature has been fully deployed, we remove the flag from the codebase.
@@ -48,7 +49,6 @@ FEATURES = {
 #
 FEATURES_PENDING_REMOVAL = {
     'activity_pages': "Show the new activity pages?",
-    'homepage_redirects': "Enable homepage redirects (for WordPress migration)?",
     'search_page': "Show the activity pages search skeleton page?",
     'use_client_boot_script': "Use the client's boot script?",
 }

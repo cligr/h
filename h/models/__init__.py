@@ -23,7 +23,6 @@ from h.models.annotation import Annotation
 from h.models.annotation_moderation import AnnotationModeration
 from h.models.auth_client import AuthClient
 from h.models.auth_ticket import AuthTicket
-from h.models.authz_code import AuthzCode
 from h.models.blocklist import Blocklist
 from h.models.document import Document, DocumentMeta, DocumentURI
 from h.models.feature import Feature
@@ -41,7 +40,6 @@ __all__ = (
     'AnnotationModeration',
     'AuthClient',
     'AuthTicket',
-    'AuthzCode',
     'Blocklist',
     'Document',
     'DocumentMeta',

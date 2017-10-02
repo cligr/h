@@ -1,46 +1,27 @@
+$base-font-size: 16px;
+$base-line-height: 22px;
+
 @import 'partials/base';
 @import 'partials/reset';
+@import 'partials/forms';
+@import 'partials/grid';
 @import 'partials/elements';
 
-// Components
-@import 'partials/masthead';
+@import 'partials/styled-text';
 
-// Help page specific element styles
-a {
-  color: $brand;
-}
+// FIXME: unify this partial and this entrypoint
+@import 'partials/help-page';
 
-// Help-page components
-
-.columns {
-  display: flex;
-  flex-direction: row;
-}
-
-.columns__col-1-2 {
-  flex-shrink: 1;
-  width: 50%;
-
-  margin-left: 20px;
-  &:first-child {
-    margin-left: 0;
-  }
-}
-
-.styled-text {
-  @include styled-text;
+body {
+  background: #fff;
 }
 
 .help-page {
   padding-top: 2.5em;
   padding-bottom: 2.5em;
-
-  background: white;
-  color: $grey-6;
-
-  font-family: 'Lato', $sans-font-family;
+  background: $body-background;
+  font-family: 'Lato', sans-serif !important;
   font-weight: 300;
-  line-height: 22px;
 
   @include breakpoint(920px) {
     padding-right: 460px;
@@ -67,7 +48,7 @@ a {
 }
 
 .help-page-heading {
-  color: $grey-6;
+  color: $gray-darker;
   margin-bottom: 1em;
   font-weight: 400;
   font-size: 1.1em;
@@ -97,7 +78,7 @@ a {
   display: block;
 
   @include breakpoint(920px) {
-    border: $grey-3 dotted 2px;
+    border: $gray-lighter dotted 2px;
     border-radius: 3px;
   }
 }
@@ -117,7 +98,7 @@ a {
   top: 60px;
   right: 60px;
   width: 210px;
-  color: $grey-4;
+  color: $gray-light;
   text-align: right;
 
   @include icons {
@@ -155,7 +136,7 @@ a {
     left: 0;
     width: 2.125em;
     height: 1.8125em;
-    border: .125em solid $brand;
+    border: .125em solid $brand-color;
     border-radius: 50%;
     text-align: center;
     padding-top: .3125em; // 24px == Line height of text.
@@ -167,7 +148,7 @@ a {
 }
 
 .feature-heading {
-  color: $grey-6;
+  color: $gray-darker;
   font-size: 1em;
   font-weight: 400;
   margin-bottom: .555em;
@@ -184,7 +165,7 @@ a {
 
 .bookmarklet {
   white-space: nowrap;
-  color: $grey-6;
+  color: $gray-darker;
   padding: 2px 4px;
   border: 1px solid;
   border-radius: 2px;

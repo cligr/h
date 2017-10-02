@@ -97,19 +97,13 @@ class AuthController(object):
 
         self.request = request
         self.schema = schemas.LoginSchema().bind(request=self.request)
-
-        show_cancel_button = bool(request.params.get('for_oauth', False))
         self.form = request.create_form(self.schema,
                                         buttons=(_('Log in'),),
-                                        footer=form_footer,
-                                        show_cancel_button=show_cancel_button)
+                                        footer=form_footer)
 
         self.logout_redirect = self.request.route_url('index')
 
     @view_config(request_method='GET')
-    @view_config(request_method='GET',
-                 request_param='for_oauth',
-                 renderer='h:templates/accounts/login_oauth.html.jinja2')
     def get(self):
         """Render the login page, including the login form."""
         self._redirect_if_logged_in()
@@ -117,9 +111,6 @@ class AuthController(object):
         return {'form': self.form.render()}
 
     @view_config(request_method='POST')
-    @view_config(request_method='POST',
-                 request_param='for_oauth',
-                 renderer='h:templates/accounts/login_oauth.html.jinja2')
     def post(self):
         """Log the user in and redirect them."""
         self._redirect_if_logged_in()
@@ -645,31 +636,34 @@ class DeveloperController(object):
 
     def __init__(self, request):
         self.request = request
-        self.svc = request.find_service(name='developer_token')
-
-        self.userid = request.authenticated_userid
 
     @view_config(request_method='GET')
     def get(self):
         """Render the developer page, including the form."""
-        token = self.svc.fetch(self.userid)
-
+        token = models.Token.get_dev_token_by_userid(
+            self.request.db,
+            self.request.authenticated_userid
+        )
         if token:
             return {'token': token.value}
-
-        return {}
+        else:
+            return {}
 
     @view_config(request_method='POST')
     def post(self):
         """(Re-)generate the user's API token."""
-        token = self.svc.fetch(self.userid)
+        token = models.Token.get_dev_token_by_userid(
+            self.request.db,
+            self.request.authenticated_userid
+        )
 
         if token:
             # The user already has an API token, regenerate it.
-            token = self.svc.regenerate(token)
+            token.regenerate()
         else:
             # The user doesn't have an API token yet, generate one for them.
-            token = self.svc.create(self.userid)
+            token = models.Token(userid=self.request.authenticated_userid)
+            self.request.db.add(token)
 
         return {'token': token.value}
 

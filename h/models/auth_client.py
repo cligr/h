@@ -8,6 +8,7 @@ from sqlalchemy.dialects import postgresql
 
 from h.db import Base
 from h.db.mixins import Timestamps
+from h.security import token_urlsafe
 
 
 class GrantType(enum.Enum):
@@ -75,8 +76,6 @@ class AuthClient(Base, Timestamps):
     """
 
     __tablename__ = 'authclient'
-    __table_args__ = (sa.CheckConstraint("(grant_type != 'authorization_code') OR (redirect_uri IS NOT NULL)",
-                                         name='authz_grant_redirect_uri'),)
 
     #: Public client identifier
     id = sa.Column(postgresql.UUID,
@@ -87,7 +86,7 @@ class AuthClient(Base, Timestamps):
     name = sa.Column(sa.UnicodeText, nullable=True)
 
     #: Client secret
-    secret = sa.Column(sa.UnicodeText, nullable=True)
+    secret = sa.Column(sa.UnicodeText, default=token_urlsafe, nullable=False)
 
     #: Authority for which this client is allowed to authorize users.
     authority = sa.Column(sa.UnicodeText, nullable=False)
@@ -99,15 +98,6 @@ class AuthClient(Base, Timestamps):
     #: Authorization response type used by this client.
     response_type = sa.Column(sa.Enum(ResponseType, name='authclient_response_type'),
                               nullable=True)
-    #: Redirect URI for OAuth 2 authorization code grant type.
-    redirect_uri = sa.Column(sa.UnicodeText, nullable=True)
-
-    #: Is this client trusted? That is, is this client one that we control?
-    #: Trusted clients don't require explicit authorization from a user.
-    trusted = sa.Column(sa.Boolean,
-                        default=False,
-                        server_default=sa.sql.expression.false(),
-                        nullable=False)
 
     def __repr__(self):
         return 'AuthClient(id={self.id!r})'.format(self=self)

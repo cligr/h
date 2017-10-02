@@ -39,6 +39,7 @@ class TestSidebarApp(object):
                 },
                 'authDomain': 'example.com',
                 'googleAnalytics': 'UA-4567',
+                'oauthAuthorizeUrl': 'http://example.com/oauth/authorize',
                 'oauthClientId': 'test-client-id',
                 'oauthEnabled': True,
                 }
@@ -101,7 +102,6 @@ def routes(pyramid_config):
     pyramid_config.add_route('index', '/')
     pyramid_config.add_route('sidebar_app', '/app.html')
     pyramid_config.add_route('oauth_authorize', '/oauth/authorize')
-    pyramid_config.add_route('oauth_revoke', '/oauth/revoke')
 
 
 @pytest.fixture

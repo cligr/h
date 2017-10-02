@@ -13,7 +13,7 @@ class Setting(ModelFactory):
 
     class Meta:
         model = models.Setting
-        sqlalchemy_session_persistence = 'flush'
+        force_flush = True
 
     key = factory.LazyAttribute(lambda _: FAKER.domain_word())
     value = factory.LazyAttribute(lambda _: FAKER.catch_phrase())

@@ -56,6 +56,7 @@ def sidebar_app(request, extra=None):
         'authDomain': request.authority,
 
         # OAuth config.
+        'oauthAuthorizeUrl': request.route_url('oauth_authorize'),
         'oauthClientId': settings.get('h.client_oauth_id'),
 
         # The OAuth feature flag is included as part of the `app.html` config

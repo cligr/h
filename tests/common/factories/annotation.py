@@ -18,13 +18,12 @@ class Annotation(ModelFactory):
 
     class Meta:
         model = models.Annotation
-        sqlalchemy_session_persistence = 'flush'  # Always flush the db to generate annotation.id.
+        force_flush = True  # Always flush the db to generate annotation.id.
 
     tags = factory.LazyFunction(lambda: FAKER.words(nb=random.randint(0, 5)))
     target_uri = factory.Faker('uri')
     text = factory.Faker('paragraph')
-    userid = factory.LazyFunction(lambda: "acct:{username}@{authority}".format(
-        username=FAKER.user_name(), authority=FAKER.domain_name(levels=1)))
+    userid = factory.Faker('user_name')
     document = factory.SubFactory(Document)
 
     @factory.lazy_attribute

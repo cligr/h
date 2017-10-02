@@ -43,6 +43,6 @@ def moderator(db_session, factories):
 
 @pytest.fixture
 def moderator_with_token(moderator, db_session, factories):
-    token = factories.DeveloperToken(userid=moderator.userid)
+    token = factories.Token(userid=moderator.userid)
     db_session.commit()
     return (moderator, token)
