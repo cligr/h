@@ -2,20 +2,17 @@
 
 from __future__ import unicode_literals
 
-import mock
 from mock import Mock
 from mock import MagicMock
-from mock import call
 from pyramid import httpexceptions
 import pytest
 
 from h.services.annotation_stats import AnnotationStatsService
+from h.services.delete_user import DeleteUserService, UserDeleteError
 from h.services.user import UserService
 from h.models import Annotation
 from h.views.admin_users import (
-    UserDeletionError,
     UserNotFoundError,
-    delete_user,
     users_activate,
     users_delete,
     users_index,
@@ -157,7 +154,7 @@ def test_users_activate_flashes_success(pyramid_request):
 
 
 @users_activate_fixtures
-def test_users_activate_inits_ActivationEvent(ActivationEvent, user_service, pyramid_request):
+def test_users_activate_inits_ActivationEvent(ActivationEvent, user_service, pyramid_request): # noqa N803
     pyramid_request.params = {"userid": "acct:bob@example.com"}
 
     users_activate(pyramid_request)
@@ -167,7 +164,7 @@ def test_users_activate_inits_ActivationEvent(ActivationEvent, user_service, pyr
 
 
 @users_activate_fixtures
-def test_users_activate_calls_notify(ActivationEvent, notify, pyramid_request):
+def test_users_activate_calls_notify(ActivationEvent, notify, pyramid_request): # noqa N802
     pyramid_request.params = {"userid": "acct:bob@example.com"}
 
     users_activate(pyramid_request)
@@ -184,10 +181,6 @@ def test_users_activate_redirects(pyramid_request):
     assert isinstance(result, httpexceptions.HTTPFound)
 
 
-users_delete_fixtures = pytest.mark.usefixtures('user_service', 'fake_delete_user')
-
-
-@users_delete_fixtures
 def test_users_delete_user_not_found_error(user_service, pyramid_request):
     pyramid_request.params = {"userid": "acct:bob@foo.org"}
 
@@ -197,8 +190,7 @@ def test_users_delete_user_not_found_error(user_service, pyramid_request):
         users_delete(pyramid_request)
 
 
-@users_delete_fixtures
-def test_users_delete_deletes_user(user_service, fake_delete_user, pyramid_request):
+def test_users_delete_deletes_user(user_service, delete_user_service, pyramid_request):
     pyramid_request.params = {"userid": "acct:bob@example.com"}
     user = MagicMock()
 
@@ -206,100 +198,20 @@ def test_users_delete_deletes_user(user_service, fake_delete_user, pyramid_reque
 
     users_delete(pyramid_request)
 
-    fake_delete_user.assert_called_once_with(pyramid_request, user)
+    delete_user_service.delete.assert_called_once_with(user)
 
 
-@users_delete_fixtures
-def test_users_delete_group_creator_error(user_service, fake_delete_user, pyramid_request):
+def test_users_delete_reports_error(user_service, delete_user_service, pyramid_request):
     pyramid_request.params = {"userid": "acct:bob@example.com"}
     user = MagicMock()
-
     user_service.fetch.return_value = user
-    fake_delete_user.side_effect = UserDeletionError('group creator error')
+    delete_user_service.delete.side_effect = UserDeleteError('cannot delete user')
 
     users_delete(pyramid_request)
 
     assert pyramid_request.session.peek_flash('error') == [
-        'group creator error'
+        'cannot delete user'
     ]
-
-delete_user_fixtures = pytest.mark.usefixtures('api_storage',
-                                               'elasticsearch_helpers',
-                                               'models',
-                                               'user_created_no_groups')
-
-
-@delete_user_fixtures
-def test_delete_user_raises_when_group_creator(models, pyramid_request):
-    user = Mock()
-
-    models.Group.created_by.return_value.count.return_value = 10
-
-    with pytest.raises(UserDeletionError):
-        delete_user(pyramid_request, user)
-
-
-@delete_user_fixtures
-def test_delete_user_disassociate_group_memberships(fake_db_session, pyramid_request):
-    pyramid_request.db = fake_db_session
-    user = Mock(groups=[Mock()])
-
-    delete_user(pyramid_request, user)
-
-    assert user.groups == []
-
-
-@delete_user_fixtures
-def test_delete_user_queries_annotations(elasticsearch_helpers, factories, fake_db_session, pyramid_request):
-    pyramid_request.db = fake_db_session
-    user = factories.User(username=u'bob')
-
-    delete_user(pyramid_request, user)
-
-    elasticsearch_helpers.scan.assert_called_once_with(
-        client=pyramid_request.es.conn,
-        query={
-            'query': {
-                'filtered': {
-                    'filter': {'term': {'user': u'acct:bob@example.com'}},
-                    'query': {'match_all': {}}
-                }
-            }
-        }
-    )
-
-
-@delete_user_fixtures
-def test_delete_user_deletes_annotations(api_storage, elasticsearch_helpers, fake_db_session, pyramid_request):
-    pyramid_request.db = fake_db_session
-    user = MagicMock()
-    annotation_1 = {'_id': 'annotation-1'}
-    annotation_2 = {'_id': 'annotation-2'}
-
-    elasticsearch_helpers.scan.return_value = [annotation_1, annotation_2]
-
-    delete_user(pyramid_request, user)
-
-    assert api_storage.delete_annotation.mock_calls == [
-        call(pyramid_request.db, 'annotation-1'),
-        call(pyramid_request.db, 'annotation-2')
-    ]
-
-
-@delete_user_fixtures
-def test_delete_user_deletes_user(fake_db_session, pyramid_request):
-    pyramid_request.db = fake_db_session
-    user = MagicMock()
-
-    delete_user(pyramid_request, user)
-
-    assert user in pyramid_request.db.deleted
-
-
-@pytest.fixture
-def pyramid_request(pyramid_request):
-    pyramid_request.es = mock.MagicMock()
-    return pyramid_request
 
 
 @pytest.fixture(autouse=True)
@@ -308,23 +220,8 @@ def routes(pyramid_config):
 
 
 @pytest.fixture
-def ActivationEvent(patch):
+def ActivationEvent(patch):  # noqa N802
     return patch('h.views.admin_users.ActivationEvent')
-
-
-@pytest.fixture
-def api_storage(patch):
-    return patch('h.views.admin_users.storage')
-
-
-@pytest.fixture
-def fake_delete_user(patch):
-    return patch('h.views.admin_users.delete_user')
-
-
-@pytest.fixture
-def elasticsearch_helpers(patch):
-    return patch('h.views.admin_users.es_helpers')
 
 
 @pytest.fixture
@@ -351,6 +248,7 @@ def annotation_stats_service(pyramid_config, db_session):
 
 
 @pytest.fixture
-def user_created_no_groups(models):
-    # By default, pretend that all users are the creators of 0 groups.
-    models.Group.created_by.return_value.count.return_value = 0
+def delete_user_service(pyramid_config, pyramid_request):
+    service = Mock(spec_set=DeleteUserService(request=pyramid_request))
+    pyramid_config.register_service(service, name='delete_user')
+    return service

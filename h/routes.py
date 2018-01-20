@@ -94,7 +94,6 @@ def includeme(config):
     config.add_route('oauth_authorize', '/oauth/authorize')
 
     # Client
-    config.add_route('session', '/app')
     config.add_route('sidebar_app', '/app.html')
     config.add_route('embed', '/embed.js')
 
